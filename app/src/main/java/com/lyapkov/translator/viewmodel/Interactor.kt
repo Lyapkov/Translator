@@ -1,4 +1,4 @@
-package com.lyapkov.translator.presenter
+package com.lyapkov.translator.viewmodel
 
 import io.reactivex.Observable
 
