@@ -86,3 +86,4 @@ class SearchDialogFragment : BottomSheetDialogFragment() {
         }
     }
 }
+
