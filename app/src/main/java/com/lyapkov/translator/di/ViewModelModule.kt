@@ -1,20 +1,29 @@
 package com.lyapkov.translator.di
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import com.lyapkov.translator.model.data.DataModel
+import com.lyapkov.translator.model.datasource.RetrofitImplementation
+import com.lyapkov.translator.model.datasource.RoomDataBaseImplementation
+import com.lyapkov.translator.model.repository.Repository
+import com.lyapkov.translator.model.repository.RepositoryImplementation
+import com.lyapkov.translator.view.main.MainInteractor
 import com.lyapkov.translator.view.main.MainViewModel
-import dagger.Binds
-import dagger.Module
-import dagger.multibindings.IntoMap
+import org.koin.core.qualifier.named
+import org.koin.dsl.module
 
-@Module(includes = [InteractorModule::class])
-internal abstract class ViewModelModule {
+val application = module {
+    single<Repository<List<DataModel>>>(named(NAME_REMOTE)) {
+        RepositoryImplementation(
+            RetrofitImplementation()
+        )
+    }
+    single<Repository<List<DataModel>>>(named(NAME_LOCAL)) {
+        RepositoryImplementation(
+            RoomDataBaseImplementation()
+        )
+    }
+}
 
-    @Binds
-    internal abstract fun bindViewModelFactory(factory: ViewModelFactory): ViewModelProvider.Factory
-
-    @Binds
-    @IntoMap
-    @ViewModelKey(MainViewModel::class)
-    protected abstract fun mainViewModel(mainViewModel: MainViewModel): ViewModel
+val mainScreen = module {
+    factory { MainInteractor(get(named(NAME_REMOTE)), get(named(NAME_LOCAL))) }
+    factory { MainViewModel(get()) }
 }
