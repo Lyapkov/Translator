@@ -1,41 +1,30 @@
 package com.lyapkov.translator.di
 
 import androidx.room.Room
-import com.lyapkov.translator.view.history.HistoryInteractor
-import com.lyapkov.translator.view.history.HistoryViewModel
+import com.lyapkov.model.data.DataModel
+import com.lyapkov.repository.*
+import com.lyapkov.repository.room.HistoryDataBase
 import com.lyapkov.translator.view.main.MainInteractor
 import com.lyapkov.translator.view.main.MainViewModel
+import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module
 
+fun injectDependencies() = loadModules
+
+private val loadModules by lazy {
+    loadKoinModules(listOf(application, mainScreen))
+}
+
 val application = module {
-    single {
-        Room.databaseBuilder(
-            get(),
-            com.lyapkov.repository.room.HistoryDataBase::class.java,
-            "HistoryDB"
-        ).build()
-    }
-    single { get<com.lyapkov.repository.room.HistoryDataBase>().historyDao() }
-    single<com.lyapkov.repository.Repository<List<com.lyapkov.model.data.DataModel>>> {
-        com.lyapkov.repository.RepositoryImplementation(
-            com.lyapkov.repository.RetrofitImplementation()
-        )
-    }
-    single<com.lyapkov.repository.RepositoryLocal<List<com.lyapkov.model.data.DataModel>>> {
-        com.lyapkov.repository.RepositoryImplementationLocal(
-            com.lyapkov.repository.RoomDataBaseImplementation(
-                get()
-            )
-        )
+    single { Room.databaseBuilder(get(), HistoryDataBase::class.java, "HistoryDB").build() }
+    single { get<HistoryDataBase>().historyDao() }
+    single<Repository<List<DataModel>>> { RepositoryImplementation(RetrofitImplementation()) }
+    single<RepositoryLocal<List<DataModel>>> {
+        RepositoryImplementationLocal(RoomDataBaseImplementation(get()))
     }
 }
 
 val mainScreen = module {
     factory { MainViewModel(get()) }
     factory { MainInteractor(get(), get()) }
-}
-
-val historyScreen = module {
-    factory { HistoryViewModel(get()) }
-    factory { HistoryInteractor(get(), get()) }
 }
