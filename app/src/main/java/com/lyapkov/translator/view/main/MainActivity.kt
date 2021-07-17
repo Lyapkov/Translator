@@ -6,12 +6,10 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.lifecycle.Observer
+import com.lyapkov.core.BaseActivity
+import com.lyapkov.model.data.AppState
 import com.lyapkov.translator.R
-import com.lyapkov.translator.model.data.AppState
-import com.lyapkov.translator.model.data.DataModel
-import com.lyapkov.translator.utils.convertMeaningsToString
 import com.lyapkov.translator.utils.network.isOnline
-import com.lyapkov.translator.view.base.BaseActivity
 import com.lyapkov.translator.view.descriptionscreen.DescriptionActivity
 import com.lyapkov.translator.view.history.HistoryActivity
 import com.lyapkov.translator.view.main.adapter.MainAdapter
@@ -33,12 +31,12 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         }
     private val onListItemClickListener: MainAdapter.OnListItemClickListener =
         object : MainAdapter.OnListItemClickListener {
-            override fun onItemClick(data: DataModel) {
+            override fun onItemClick(data: com.lyapkov.model.data.DataModel) {
                 startActivity(
                     DescriptionActivity.getIntent(
                         this@MainActivity,
                         data.text!!,
-                        convertMeaningsToString(data.meanings!!),
+                        com.lyapkov.repository.convertMeaningsToString(data.meanings!!),
                         data.meanings[0].imageUrl
                     )
                 )
@@ -63,7 +61,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         initViews()
     }
 
-    override fun setDataToAdapter(data: List<DataModel>) {
+    override fun setDataToAdapter(data: List<com.lyapkov.model.data.DataModel>) {
         adapter.setData(data)
     }
 
@@ -88,7 +86,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
         }
         val viewModel: MainViewModel by viewModel()
         model = viewModel
-        model.subscribe().observe(this@MainActivity, Observer<AppState> { renderData(it) })
+        model.subscribe().observe(this@MainActivity, Observer<com.lyapkov.model.data.AppState> { renderData(it) })
     }
 
     private fun initViews() {
