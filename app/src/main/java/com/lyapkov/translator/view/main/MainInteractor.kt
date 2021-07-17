@@ -1,23 +1,23 @@
 package com.lyapkov.translator.view.main
 
-import com.lyapkov.translator.model.data.AppState
-import com.lyapkov.translator.model.data.DataModel
-import com.lyapkov.translator.model.repository.Repository
-import com.lyapkov.translator.model.repository.RepositoryLocal
-import com.lyapkov.translator.viewmodel.Interactor
+import com.lyapkov.model.data.AppState
+import com.lyapkov.model.data.DataModel
+import com.lyapkov.repository.Repository
+import com.lyapkov.repository.RepositoryLocal
+import com.lyapkov.core.viewmodel.Interactor
 
 class MainInteractor(
-    private val repositoryRemote: Repository<List<DataModel>>,
-    private val repositoryLocal: RepositoryLocal<List<DataModel>>
-) : Interactor<AppState> {
+    private val repositoryRemote: com.lyapkov.repository.Repository<List<com.lyapkov.model.data.DataModel>>,
+    private val repositoryLocal: com.lyapkov.repository.RepositoryLocal<List<com.lyapkov.model.data.DataModel>>
+) : Interactor<com.lyapkov.model.data.AppState> {
 
-    override suspend fun getData(word: String, fromRemoteSource: Boolean): AppState {
-        val appState: AppState
+    override suspend fun getData(word: String, fromRemoteSource: Boolean): com.lyapkov.model.data.AppState {
+        val appState: com.lyapkov.model.data.AppState
         if (fromRemoteSource) {
-            appState = AppState.Success(repositoryRemote.getData(word))
+            appState = com.lyapkov.model.data.AppState.Success(repositoryRemote.getData(word))
             repositoryLocal.saveToDB(appState)
         } else {
-            appState = AppState.Success(repositoryLocal.getData(word))
+            appState = com.lyapkov.model.data.AppState.Success(repositoryLocal.getData(word))
         }
         return appState
     }

@@ -15,7 +15,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.lyapkov.translator.R
 import com.lyapkov.translator.utils.network.isOnline
-import com.lyapkov.translator.utils.ui.AlertDialogFragment
+import com.lyapkov.utils.ui.AlertDialogFragment
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_description.*
