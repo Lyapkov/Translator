@@ -1,23 +1,24 @@
 package com.lyapkov.translator.view.main
 
+import com.lyapkov.core.viewmodel.Interactor
 import com.lyapkov.model.data.AppState
-import com.lyapkov.model.data.DataModel
+import com.lyapkov.model.data.dto.SearchResultDto
 import com.lyapkov.repository.Repository
 import com.lyapkov.repository.RepositoryLocal
-import com.lyapkov.core.viewmodel.Interactor
+import com.lyapkov.translator.utils.mapSearchResultToResult
 
 class MainInteractor(
-    private val repositoryRemote: com.lyapkov.repository.Repository<List<com.lyapkov.model.data.DataModel>>,
-    private val repositoryLocal: com.lyapkov.repository.RepositoryLocal<List<com.lyapkov.model.data.DataModel>>
-) : Interactor<com.lyapkov.model.data.AppState> {
+    private val repositoryRemote: Repository<List<SearchResultDto>>,
+    private val repositoryLocal: RepositoryLocal<List<SearchResultDto>>
+) : Interactor<AppState> {
 
-    override suspend fun getData(word: String, fromRemoteSource: Boolean): com.lyapkov.model.data.AppState {
-        val appState: com.lyapkov.model.data.AppState
+    override suspend fun getData(word: String, fromRemoteSource: Boolean): AppState {
+        val appState: AppState
         if (fromRemoteSource) {
-            appState = com.lyapkov.model.data.AppState.Success(repositoryRemote.getData(word))
+            appState = AppState.Success(mapSearchResultToResult(repositoryRemote.getData(word)))
             repositoryLocal.saveToDB(appState)
         } else {
-            appState = com.lyapkov.model.data.AppState.Success(repositoryLocal.getData(word))
+            appState = AppState.Success(mapSearchResultToResult(repositoryLocal.getData(word)))
         }
         return appState
     }

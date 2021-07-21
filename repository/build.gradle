@@ -20,8 +20,6 @@ dependencies {
 
     //Room
     implementation Room.runtime
-    implementation 'androidx.room:room-runtime:2.3.0'
-    annotationProcessor 'androidx.room:room-compiler:2.3.0'
     kapt Room.compiler
     implementation Room.room_ktx
 

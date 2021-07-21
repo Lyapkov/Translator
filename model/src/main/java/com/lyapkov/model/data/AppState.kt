@@ -1,5 +1,7 @@
 package com.lyapkov.model.data
 
+import com.lyapkov.model.data.userdata.DataModel
+
 sealed class AppState {
 
     data class Success(val data: List<DataModel>?) : AppState()

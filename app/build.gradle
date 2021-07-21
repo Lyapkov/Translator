@@ -23,7 +23,8 @@ android {
         sourceCompatibility Config.java_version
         targetCompatibility Config.java_version
     }
-    dynamicFeatures = [':dynamicfeature']
+
+    dynamicFeatures = [Modules.historyScreen]
 }
 
 dependencies {
@@ -32,7 +33,6 @@ dependencies {
     implementation project(Modules.model)
     implementation project(Modules.repository)
     implementation project(Modules.utils)
-    implementation project(Modules.historyScreen) //Feature
 
     //AndroidX
     implementation Tools.multidex
