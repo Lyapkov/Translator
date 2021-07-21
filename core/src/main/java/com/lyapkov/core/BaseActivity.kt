@@ -1,14 +1,15 @@
 package com.lyapkov.core
 
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import com.lyapkov.core.viewmodel.BaseViewModel
 import com.lyapkov.core.viewmodel.Interactor
 import com.lyapkov.model.data.AppState
-import com.lyapkov.model.data.DataModel
-import com.lyapkov.translator.utils.network.isOnline
+import com.lyapkov.model.data.userdata.DataModel
+import com.lyapkov.translator.utils.network.OnlineLiveData
 import com.lyapkov.utils.ui.AlertDialogFragment
 import kotlinx.android.synthetic.main.loading_layout.*
 
@@ -16,17 +17,18 @@ private const val DIALOG_FRAGMENT_TAG = "74a54328-5d62-46bf-ab6b-cbf5d8c79522"
 
 abstract class BaseActivity<T : AppState, I : Interactor<T>> : AppCompatActivity() {
 
-    abstract val model: BaseViewModel<T>
-    protected var isNetworkAvailable: Boolean = false
+    protected abstract val model: BaseViewModel<T>
+    protected abstract val layoutRes: Int
+    protected var isNetworkAvailable: Boolean = true
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
-        isNetworkAvailable = isOnline(applicationContext)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(layoutRes)
+        subscribeToNetworkChange()
     }
 
     override fun onResume() {
         super.onResume()
-        isNetworkAvailable = isOnline(applicationContext)
         if (!isNetworkAvailable && isDialogNull()) {
             showNoInternetConnectionDialog()
         }
@@ -72,7 +74,7 @@ abstract class BaseActivity<T : AppState, I : Interactor<T>> : AppCompatActivity
         )
     }
 
-    protected fun showAlertDialog(title: String?, message: String?) {
+    private fun showAlertDialog(title: String?, message: String?) {
         AlertDialogFragment.newInstance(title, message)
             .show(supportFragmentManager, DIALOG_FRAGMENT_TAG)
     }
@@ -89,6 +91,20 @@ abstract class BaseActivity<T : AppState, I : Interactor<T>> : AppCompatActivity
         return supportFragmentManager.findFragmentByTag(DIALOG_FRAGMENT_TAG) == null
     }
 
+    private fun subscribeToNetworkChange() {
+        OnlineLiveData(this).observe(
+            this@BaseActivity,
+            Observer<Boolean> {
+                isNetworkAvailable = it
+                if (!isNetworkAvailable) {
+                    Toast.makeText(
+                        this@BaseActivity,
+                        R.string.dialog_message_device_is_offline,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            })
+    }
+
     abstract fun setDataToAdapter(data: List<DataModel>)
 }
-

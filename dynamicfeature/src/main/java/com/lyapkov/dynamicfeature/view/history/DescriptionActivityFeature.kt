@@ -1,4 +1,4 @@
-package com.lyapkov.translator.view.descriptionscreen
+package com.lyapkov.dynamicfeature.view.history
 
 import android.content.Context
 import android.content.Intent
@@ -7,25 +7,21 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
-import com.lyapkov.translator.R
-import com.lyapkov.translator.utils.network.OnlineLiveData
-import com.lyapkov.utils.ui.AlertDialogFragment
+import com.lyapkov.dynamicfeature.R
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.activity_description.*
+import kotlinx.android.synthetic.main.activity_description_feature.*
 
-class DescriptionActivity : AppCompatActivity() {
+class DescriptionActivityFeature : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_description)
+        setContentView(R.layout.activity_description_feature)
 
         setActionbarHomeButtonAsUp()
         description_screen_swipe_refresh_layout.setOnRefreshListener { startLoadingOrShowError() }
@@ -61,22 +57,7 @@ class DescriptionActivity : AppCompatActivity() {
     }
 
     private fun startLoadingOrShowError() {
-        OnlineLiveData(this).observe(
-            this@DescriptionActivity,
-            Observer<Boolean> {
-                if (it) {
-                    setData()
-                } else {
-                    AlertDialogFragment.newInstance(
-                        getString(R.string.dialog_title_device_is_offline),
-                        getString(R.string.dialog_message_device_is_offline)
-                    ).show(
-                        supportFragmentManager,
-                        DIALOG_FRAGMENT_TAG
-                    )
-                    stopRefreshAnimationIfNeeded()
-                }
-            })
+        setData()
     }
 
     private fun stopRefreshAnimationIfNeeded() {
@@ -87,7 +68,7 @@ class DescriptionActivity : AppCompatActivity() {
 
     private fun usePicassoToLoadPhoto(imageView: ImageView, imageLink: String) {
         Picasso.with(applicationContext).load("https:$imageLink")
-            .placeholder(R.drawable.ic_no_photo_vector).fit().centerCrop()
+            .placeholder(android.R.drawable.btn_default).fit().centerCrop()
             .into(imageView, object : Callback {
                 override fun onSuccess() {
                     stopRefreshAnimationIfNeeded()
@@ -95,7 +76,7 @@ class DescriptionActivity : AppCompatActivity() {
 
                 override fun onError() {
                     stopRefreshAnimationIfNeeded()
-                    imageView.setImageResource(R.drawable.ic_load_error_vector)
+                    imageView.setImageResource(android.R.drawable.btn_default)
                 }
             })
     }
@@ -111,7 +92,7 @@ class DescriptionActivity : AppCompatActivity() {
                     isFirstResource: Boolean
                 ): Boolean {
                     stopRefreshAnimationIfNeeded()
-                    imageView.setImageResource(R.drawable.ic_load_error_vector)
+                    imageView.setImageResource(android.R.drawable.btn_default)
                     return false
                 }
 
@@ -119,7 +100,7 @@ class DescriptionActivity : AppCompatActivity() {
                     resource: Drawable?,
                     model: Any?,
                     target: Target<Drawable>?,
-                    dataSource: DataSource?,
+                    dataSource: com.bumptech.glide.load.DataSource?,
                     isFirstResource: Boolean
                 ): Boolean {
                     stopRefreshAnimationIfNeeded()
@@ -128,7 +109,7 @@ class DescriptionActivity : AppCompatActivity() {
             })
             .apply(
                 RequestOptions()
-                    .placeholder(R.drawable.ic_no_photo_vector)
+                    .placeholder(android.R.drawable.btn_default)
                     .centerCrop()
             )
             .into(imageView)
@@ -147,7 +128,7 @@ class DescriptionActivity : AppCompatActivity() {
             word: String,
             description: String,
             url: String?
-        ): Intent = Intent(context, DescriptionActivity::class.java).apply {
+        ): Intent = Intent(context, DescriptionActivityFeature::class.java).apply {
             putExtra(WORD_EXTRA, word)
             putExtra(DESCRIPTION_EXTRA, description)
             putExtra(URL_EXTRA, url)

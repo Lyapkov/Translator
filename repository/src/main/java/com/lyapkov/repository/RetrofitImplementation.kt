@@ -1,21 +1,23 @@
 package com.lyapkov.repository
 
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
-import com.lyapkov.model.data.DataModel
+import com.lyapkov.model.data.dto.SearchResultDto
+import com.lyapkov.repository.api.ApiService
+import com.lyapkov.repository.api.BaseInterceptor
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class RetrofitImplementation : DataSource<List<DataModel>> {
+class RetrofitImplementation : DataSource<List<SearchResultDto>> {
 
-    override suspend fun getData(word: String): List<DataModel> {
-        return getService(com.lyapkov.repository.api.BaseInterceptor.interceptor).searchAsync(word).await()
+    override suspend fun getData(word: String): List<SearchResultDto> {
+        return getService(BaseInterceptor.interceptor).searchAsync(word).await()
     }
 
-    private fun getService(interceptor: Interceptor): com.lyapkov.repository.api.ApiService {
-        return createRetrofit(interceptor).create(com.lyapkov.repository.api.ApiService::class.java)
+    private fun getService(interceptor: Interceptor): ApiService {
+        return createRetrofit(interceptor).create(ApiService::class.java)
     }
 
     private fun createRetrofit(interceptor: Interceptor): Retrofit {

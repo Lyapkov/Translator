@@ -7,6 +7,8 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
@@ -19,26 +21,30 @@ import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
 import com.google.android.play.core.splitinstall.SplitInstallRequest
 import com.lyapkov.core.BaseActivity
 import com.lyapkov.model.data.AppState
-import com.lyapkov.model.data.DataModel
+import com.lyapkov.model.data.userdata.DataModel
 import com.lyapkov.translator.R
 import com.lyapkov.translator.di.injectDependencies
-import com.lyapkov.translator.utils.convertMeaningsToString
-import com.lyapkov.translator.utils.network.isOnline
+import com.lyapkov.translator.utils.convertMeaningsToSingleString
 import com.lyapkov.translator.view.descriptionscreen.DescriptionActivity
 import com.lyapkov.translator.view.main.adapter.MainAdapter
-import geekbrains.ru.history.view.history.HistoryActivity
+import com.lyapkov.utils.ui.viewById
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_recyclerview_item.*
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.android.scope.currentScope
 
 private const val BOTTOM_SHEET_FRAGMENT_DIALOG_TAG = "74a54328-5d62-46bf-ab6b-cbf5fgt0-092395"
-private const val HISTORY_ACTIVITY_PATH = "com.lyapkov.history.view.history.HistoryActivity"
+private const val HISTORY_ACTIVITY_PATH = "geekbrains.ru.history.view.history.HistoryActivity"
 private const val HISTORY_ACTIVITY_FEATURE_NAME = "historyScreen"
 private const val REQUEST_CODE = 42
 
 class MainActivity : BaseActivity<AppState, MainInteractor>() {
 
+    override val layoutRes = R.layout.activity_main
     override lateinit var model: MainViewModel
+
+    private val mainActivityRecyclerView by viewById<RecyclerView>(R.id.main_activity_recyclerview)
+    private val searchFAB by viewById<FloatingActionButton>(R.id.search_fab)
+
     private lateinit var splitInstallManager: SplitInstallManager
     private lateinit var appUpdateManager: AppUpdateManager
 
@@ -55,9 +61,9 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
                 startActivity(
                     DescriptionActivity.getIntent(
                         this@MainActivity,
-                        data.text!!,
-                        convertMeaningsToString(data.meanings!!),
-                        data.meanings!![0].imageUrl
+                        data.text,
+                        convertMeaningsToSingleString(data.meanings),
+                        data.meanings[0].imageUrl
                     )
                 )
             }
@@ -65,7 +71,6 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     private val onSearchClickListener: SearchDialogFragment.OnSearchClickListener =
         object : SearchDialogFragment.OnSearchClickListener {
             override fun onClick(searchWord: String) {
-                isNetworkAvailable = isOnline(applicationContext)
                 if (isNetworkAvailable) {
                     model.getData(searchWord, isNetworkAvailable)
                 } else {
@@ -84,7 +89,6 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
         iniViewModel()
         initViews()
         checkForUpdates()
@@ -131,7 +135,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.history_menu, menu)
+        menuInflater.inflate(R.menu.main_screen_menu, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -184,7 +188,7 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     private fun popupSnackbarForCompleteUpdate() {
         Snackbar.make(
             findViewById(R.id.activity_main_layout),
-            "An update has just been downloaded.",
+            getString(R.string.snackbar_update_downloaded_notification),
             Snackbar.LENGTH_INDEFINITE
         ).apply {
             setAction("RESTART") { appUpdateManager.completeUpdate() }
@@ -193,15 +197,15 @@ class MainActivity : BaseActivity<AppState, MainInteractor>() {
     }
 
     private fun iniViewModel() {
-        check(main_activity_recyclerview.adapter == null) { "The ViewModel should be initialised first" }
+        check(mainActivityRecyclerView.adapter == null) { "The ViewModel should be initialised first" }
         injectDependencies()
-        val viewModel: MainViewModel by viewModel()
+        val viewModel: MainViewModel by currentScope.inject()
         model = viewModel
         model.subscribe().observe(this@MainActivity, Observer<AppState> { renderData(it) })
     }
 
     private fun initViews() {
-        search_fab.setOnClickListener(fabClickListener)
-        main_activity_recyclerview.adapter = adapter
+        searchFAB.setOnClickListener(fabClickListener)
+        mainActivityRecyclerView.adapter = adapter
     }
 }

@@ -9,7 +9,7 @@ class TranslatorApp : Application() {
     override fun onCreate() {
         super.onCreate()
         startKoin {
-            androidContext(applicationContext)
+            androidContext(this@TranslatorApp)
         }
     }
 }

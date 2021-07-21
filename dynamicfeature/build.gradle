@@ -4,27 +4,24 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion Config.compile_sdk
+    compileSdkVersion 29
 
     defaultConfig {
-        minSdkVersion Config.min_sdk
-        targetSdkVersion Config.target_sdk
-        versionCode Releases.version_code
-        versionName Releases.version_name
+        minSdkVersion 21
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+
     }
 }
 
 dependencies {
-    implementation project(Modules.app)
-    implementation project(Modules.model)
-    implementation project(Modules.repository)
-    implementation project(Modules.core)
-
     //AndroidX
     implementation Tools.multidex
     implementation Design.appcompat
 
     //Design
+    //You should not use the com.android.support and com.google.android.material dependencies in your app at the same time
     implementation Design.material
 
     //Kotlin
@@ -33,22 +30,13 @@ dependencies {
     implementation Kotlin.coroutines_core
     implementation Kotlin.coroutines_android
 
-    //Koin for Android
-    implementation Koin.koin_android
-    implementation Koin.koin_view_model
+    //Download images
+    //Picasso
+    implementation Picasso.picasso
+    //Glide
+    implementation Glide.glide
+    kapt Glide.glide_compiler
 
-    //Room
-    implementation Room.runtime
-    kapt Room.compiler
-    implementation Room.room_ktx
-
-    //Test
-    testImplementation TestImpl.junit
-    androidTestImplementation TestImpl.runner
-    androidTestImplementation TestImpl.espresso
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-}
-
-repositories {
-    mavenCentral()
+    implementation project(':app')
 }

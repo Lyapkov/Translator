@@ -1,9 +1,10 @@
-package geekbrains.ru.history.view.history
+package com.lyapkov.historyscreen.view.history
 
 import androidx.lifecycle.LiveData
 import com.lyapkov.core.viewmodel.BaseViewModel
 import com.lyapkov.model.data.AppState
-import geekbrains.ru.history.parseLocalSearchResults
+import com.lyapkov.historyscreen.parseLocalSearchResults
+import geekbrains.ru.history.view.history.HistoryInteractor
 import kotlinx.coroutines.launch
 
 class HistoryViewModel(private val interactor: HistoryInteractor) :

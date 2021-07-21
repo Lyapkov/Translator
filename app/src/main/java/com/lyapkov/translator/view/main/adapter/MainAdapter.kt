@@ -4,9 +4,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.lyapkov.model.data.DataModel
+import com.lyapkov.model.data.userdata.DataModel
 import com.lyapkov.translator.R
-import com.lyapkov.translator.utils.convertMeaningsToString
+import com.lyapkov.translator.utils.convertMeaningsToSingleString
+import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.activity_main_recyclerview_item.view.*
 
 class MainAdapter(private var onListItemClickListener: OnListItemClickListener) :
@@ -34,13 +35,16 @@ class MainAdapter(private var onListItemClickListener: OnListItemClickListener) 
         return data.size
     }
 
-    inner class RecyclerItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    //ViewHolder должен имплементировать интерфейс LayoutContainer, иначе view не будет браться из кеша
+    inner class RecyclerItemViewHolder(override val containerView: View) :
+        RecyclerView.ViewHolder(containerView),
+        LayoutContainer {
 
         fun bind(data: DataModel) {
             if (layoutPosition != RecyclerView.NO_POSITION) {
                 itemView.header_textview_recycler_item.text = data.text
                 itemView.description_textview_recycler_item.text =
-                    convertMeaningsToString(data.meanings!!)
+                    convertMeaningsToSingleString(data.meanings)
                 itemView.setOnClickListener { openInNewWindow(data) }
             }
         }
